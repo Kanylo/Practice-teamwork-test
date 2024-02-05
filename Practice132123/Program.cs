@@ -9,9 +9,9 @@ class Program
 
     static void Main()
     {
-        LoadMathReference();
         while (true)
         {
+            LoadMathReference();
             Console.Clear();
             DisplayMenu();
             char choice = GetChoice();
@@ -46,16 +46,6 @@ class Program
         }
     }
 
-    static void DisplayMenu()
-    {
-        Console.WriteLine("1. Показати математичний довідник!");
-        Console.WriteLine("2. Додати новий запис");
-        Console.WriteLine("3. Редагувати запис");
-        Console.WriteLine("4. Видалити запис");
-        Console.WriteLine("5. Сортувати");
-        Console.WriteLine("6. Вийти");
-    }
-
     static void LoadMathReference()
     {
         if (File.Exists("MathReference.json"))
@@ -63,6 +53,16 @@ class Program
             string jsonData = File.ReadAllText("MathReference.json");
             mathReferenceList = JsonConvert.DeserializeObject<List<MathReferenceItem>>(jsonData);
         }
+    }
+
+    static void DisplayMenu()
+    {
+        Console.WriteLine("1. Показати математичний довідник");
+        Console.WriteLine("2. Додати новий запис");
+        Console.WriteLine("3. Редагувати запис");
+        Console.WriteLine("4. Видалити запис");
+        Console.WriteLine("5. Сортувати");
+        Console.WriteLine("6. Вийти");
     }
 
     static char GetChoice()
@@ -82,12 +82,28 @@ class Program
         }
         else
         {
+            int index = 1;
             foreach (var item in mathReferenceList)
             {
-                Console.WriteLine($"{item.Topic}: {item.Description}");
+                Console.WriteLine($"{index}. {item.Topic}");
+                index++;
+            }
+
+            Console.Write("Введіть номер запису для перегляду: ");
+            if (int.TryParse(Console.ReadLine(), out int displayIndex) && displayIndex > 0 && displayIndex <= mathReferenceList.Count)
+            {
+                var selectedMathReference = mathReferenceList[displayIndex - 1];
+                Console.WriteLine($"Тема: {selectedMathReference.Topic}");
+                Console.WriteLine($"Опис: {selectedMathReference.Description}");
+            }
+            else
+            {
+                Console.WriteLine("Невірний номер запису.");
             }
         }
     }
+
+
 
     static void AddMathReference()
     {
@@ -101,7 +117,11 @@ class Program
         Console.WriteLine("Запис успішно додано!");
         SaveMathReference();
     }
-
+    static void SaveMathReference()
+    {
+        string jsonData = JsonConvert.SerializeObject(mathReferenceList);
+        File.WriteAllText("MathReference.json", jsonData);
+    }
     static void EditMathReference()
     {
         DisplayMathReference();
@@ -120,12 +140,6 @@ class Program
         {
             Console.WriteLine("Невірний номер запису.");
         }
-    }
-
-    static void SaveMathReference()
-    {
-        string jsonData = JsonConvert.SerializeObject(mathReferenceList);
-        File.WriteAllText("MathReference.json", jsonData);
     }
 
     static void DeleteMathReference()
