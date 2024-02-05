@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.IO;
+using Newtonsoft.Json;
 class Program
 {
     static List<MathReferenceItem> mathReferenceList = new List<MathReferenceItem>();
 
     static void Main()
     {
+        LoadMathReference();
         while (true)
         {
             Console.Clear();
@@ -46,12 +48,21 @@ class Program
 
     static void DisplayMenu()
     {
-        Console.WriteLine("1. Показати математичний довідник");
+        Console.WriteLine("1. Показати математичний довідник!");
         Console.WriteLine("2. Додати новий запис");
         Console.WriteLine("3. Редагувати запис");
         Console.WriteLine("4. Видалити запис");
         Console.WriteLine("5. Сортувати");
         Console.WriteLine("6. Вийти");
+    }
+
+    static void LoadMathReference()
+    {
+        if (File.Exists("MathReference.json"))
+        {
+            string jsonData = File.ReadAllText("MathReference.json");
+            mathReferenceList = JsonConvert.DeserializeObject<List<MathReferenceItem>>(jsonData);
+        }
     }
 
     static char GetChoice()
@@ -88,6 +99,7 @@ class Program
 
         mathReferenceList.Add(new MathReferenceItem { Topic = topic, Description = description });
         Console.WriteLine("Запис успішно додано!");
+        SaveMathReference();
     }
 
     static void EditMathReference()
@@ -108,6 +120,12 @@ class Program
         {
             Console.WriteLine("Невірний номер запису.");
         }
+    }
+
+    static void SaveMathReference()
+    {
+        string jsonData = JsonConvert.SerializeObject(mathReferenceList);
+        File.WriteAllText("MathReference.json", jsonData);
     }
 
     static void DeleteMathReference()
