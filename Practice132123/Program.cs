@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.IO;
+using Newtonsoft.Json;
 class Program
 {
     static List<MathReferenceItem> mathReferenceList = new List<MathReferenceItem>();
@@ -10,6 +11,7 @@ class Program
     {
         while (true)
         {
+            LoadMathReference();
             Console.Clear();
             DisplayMenu();
             char choice = GetChoice();
@@ -44,6 +46,15 @@ class Program
         }
     }
 
+    static void LoadMathReference()
+    {
+        if (File.Exists("MathReference.json"))
+        {
+            string jsonData = File.ReadAllText("MathReference.json");
+            mathReferenceList = JsonConvert.DeserializeObject<List<MathReferenceItem>>(jsonData);
+        }
+    }
+
     static void DisplayMenu()
     {
         Console.WriteLine("1. Показати математичний довідник");
@@ -71,12 +82,28 @@ class Program
         }
         else
         {
+            int index = 1;
             foreach (var item in mathReferenceList)
             {
-                Console.WriteLine($"{item.Topic}: {item.Description}");
+                Console.WriteLine($"{index}. {item.Topic}");
+                index++;
+            }
+
+            Console.Write("Введіть номер запису для перегляду: ");
+            if (int.TryParse(Console.ReadLine(), out int displayIndex) && displayIndex > 0 && displayIndex <= mathReferenceList.Count)
+            {
+                var selectedMathReference = mathReferenceList[displayIndex - 1];
+                Console.WriteLine($"Тема: {selectedMathReference.Topic}");
+                Console.WriteLine($"Опис: {selectedMathReference.Description}");
+            }
+            else
+            {
+                Console.WriteLine("Невірний номер запису.");
             }
         }
     }
+
+
 
     static void AddMathReference()
     {
@@ -88,8 +115,13 @@ class Program
 
         mathReferenceList.Add(new MathReferenceItem { Topic = topic, Description = description });
         Console.WriteLine("Запис успішно додано!");
+        SaveMathReference();
     }
-
+    static void SaveMathReference()
+    {
+        string jsonData = JsonConvert.SerializeObject(mathReferenceList);
+        File.WriteAllText("MathReference.json", jsonData);
+    }
     static void EditMathReference()
     {
         DisplayMathReference();
