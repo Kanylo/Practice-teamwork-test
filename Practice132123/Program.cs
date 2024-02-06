@@ -170,15 +170,44 @@ class Program
 
     static void SortMathReference()
     {
-        mathReferenceList = mathReferenceList.OrderBy(item => item.Topic).ToList();
-        Console.WriteLine("Довідник відсортовано за темою.");
-        SaveMathReference();  // Save changes 
-    }
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("Сортування:");
+            Console.WriteLine("1. Сортувати від А до Я");
+            Console.WriteLine("2. Сортувати від Я до А");
+            Console.WriteLine("3. Повернутися до меню");
+
+            char sortChoice = GetChoice();
+
+            switch (sortChoice)
+            {
+                case '1':
+                    mathReferenceList = mathReferenceList.OrderBy(item => item.Topic).ToList();
+                    Console.WriteLine("Довідник відсортовано за темою від А до Я.");
+                    SaveMathReference();
+                    break;
+                case '2':
+                    mathReferenceList = mathReferenceList.OrderByDescending(item => item.Topic).ToList();
+                    Console.WriteLine("Довідник відсортовано за темою від Я до А.");
+                    SaveMathReference();
+                    break;
+                case '3':
+                    return;
+                default:
+                    Console.WriteLine("Невірний вибір. Спробуйте ще раз.");
+                    break;
+            }
+
+            Console.WriteLine("Натисніть будь-яку клавішу для продовження...");
+            Console.ReadKey();
+        }
     }
 
-    class MathReferenceItem
+}
+
+class MathReferenceItem
 {
     public string Topic { get; set; }
     public string Description { get; set; }
 }
-//какатест
