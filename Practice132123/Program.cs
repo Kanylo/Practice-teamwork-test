@@ -5,6 +5,8 @@ using System.IO;
 using Newtonsoft.Json;
 class Program
 {
+    const char DisplayMathReferenceChoice = '1';
+
     static List<MathReferenceItem> mathReferenceList = new List<MathReferenceItem>();
 
     static void Main()
@@ -15,7 +17,6 @@ class Program
             Console.Clear();
             DisplayMenu();
             char choice = GetChoice();
-
             switch (choice)
             {
                 case '1':
@@ -46,6 +47,7 @@ class Program
         }
     }
 
+
     static void LoadMathReference()
     {
         if (File.Exists("MathReference.json"))
@@ -68,7 +70,9 @@ class Program
     static char GetChoice()
     {
         Console.Write("Введіть ваш вибір: ");
-        return Console.ReadKey().KeyChar;
+        char choice = Console.ReadKey().KeyChar;
+        Console.WriteLine();
+        return choice;
     }
 
     static void DisplayMathReference()
@@ -89,20 +93,25 @@ class Program
                 index++;
             }
 
-            Console.Write("Введіть номер запису для перегляду: ");
-            if (int.TryParse(Console.ReadLine(), out int displayIndex) && displayIndex > 0 && displayIndex <= mathReferenceList.Count)
+            Console.Write("Введіть номер запису для перегляду або натисніть Enter для повернення до меню: ");
+            string input = Console.ReadLine();
+            if (int.TryParse(input, out int displayIndex) && displayIndex > 0 && displayIndex <= mathReferenceList.Count)
             {
-                var selectedMathReference = mathReferenceList[displayIndex - 1];
-                Console.WriteLine($"Тема: {selectedMathReference.Topic}");
-                Console.WriteLine($"Опис: {selectedMathReference.Description}");
+                DisplayMathReferenceItem(displayIndex - 1);
             }
-            else
+            else if (!string.IsNullOrEmpty(input))
             {
                 Console.WriteLine("Невірний номер запису.");
             }
         }
     }
 
+    static void DisplayMathReferenceItem(int index)
+    {
+        var selectedMathReference = mathReferenceList[index];
+        Console.WriteLine($"Тема: {selectedMathReference.Topic}");
+        Console.WriteLine($"Опис: {selectedMathReference.Description}");
+    }
 
 
     static void AddMathReference()
@@ -135,6 +144,7 @@ class Program
 
             mathReferenceList[index - 1] = new MathReferenceItem { Topic = newTopic, Description = newDescription };
             Console.WriteLine("Запис успішно відредаговано!");
+            SaveMathReference();  // Save changes 
         }
         else
         {
@@ -150,6 +160,7 @@ class Program
         {
             mathReferenceList.RemoveAt(index - 1);
             Console.WriteLine("Запис успішно видалено!");
+            SaveMathReference();  // Save changes 
         }
         else
         {
@@ -159,9 +170,40 @@ class Program
 
     static void SortMathReference()
     {
-        mathReferenceList = mathReferenceList.OrderBy(item => item.Topic).ToList();
-        Console.WriteLine("Довідник відсортовано за темою.");
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("Сортування:");
+            Console.WriteLine("1. Сортувати від А до Я");
+            Console.WriteLine("2. Сортувати від Я до А");
+            Console.WriteLine("3. Повернутися до меню");
+
+            char sortChoice = GetChoice();
+
+            switch (sortChoice)
+            {
+                case '1':
+                    mathReferenceList = mathReferenceList.OrderBy(item => item.Topic).ToList();
+                    Console.WriteLine("Довідник відсортовано за темою від А до Я.");
+                    SaveMathReference();
+                    break;
+                case '2':
+                    mathReferenceList = mathReferenceList.OrderByDescending(item => item.Topic).ToList();
+                    Console.WriteLine("Довідник відсортовано за темою від Я до А.");
+                    SaveMathReference();
+                    break;
+                case '3':
+                    return;
+                default:
+                    Console.WriteLine("Невірний вибір. Спробуйте ще раз.");
+                    break;
+            }
+
+            Console.WriteLine("Натисніть будь-яку клавішу для продовження...");
+            Console.ReadKey();
+        }
     }
+
 }
 
 class MathReferenceItem
