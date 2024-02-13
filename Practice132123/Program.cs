@@ -50,9 +50,9 @@ class Program
 
     static void LoadMathReference()
     {
-        if (File.Exists("MathReference.json"))
+        if (File.Exists("../../data/MathReference.json"))
         {
-            string jsonData = File.ReadAllText("MathReference.json");
+            string jsonData = File.ReadAllText("../../data/MathReference.json");
             mathReferenceList = JsonConvert.DeserializeObject<List<MathReferenceItem>>(jsonData);
         }
     }
@@ -129,7 +129,7 @@ class Program
     static void SaveMathReference()
     {
         string jsonData = JsonConvert.SerializeObject(mathReferenceList);
-        File.WriteAllText("MathReference.json", jsonData);
+        File.WriteAllText("../../data/MathReference.json", jsonData);
     }
     static void EditMathReference()
     {
